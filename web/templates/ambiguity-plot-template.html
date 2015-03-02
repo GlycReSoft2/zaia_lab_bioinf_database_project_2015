@@ -1,0 +1,64 @@
+<div class='amiguity-container'>
+    <div class='plot-grouping-fn-selector-container'>
+        Plot Function
+        <select class='plot-grouping-fn-selector-box' ng-model='grouping.groupingFnKey'
+            ng-options='key for (key, value) in grouping.groupingsOptions' ng-change='plotSelectorChanged()'>
+        </select>
+        <label>Hide Unambiguous <input type='checkbox' ng-model='ambiguityPlotParams.hideUnambiguous'/></label>
+        <a ng-click='ambiguityPlotParams.showCustomPlotter=!ambiguityPlotParams.showCustomPlotter'> Make Your Own</a>
+        <span class='custom-fn-menu' ng-show='ambiguityPlotParams.showCustomPlotter'>
+            <button class='btn btn-primary' ng-click='customPlot()'>Plot</button>
+        </span>
+        <div ng-show='ambiguityPlotParams.showCustomPlotter' class='plot-grouping-fn-selector-container custom-fn-menu'>
+            X Axis
+            <select class='plot-grouping-fn-selector-box' ng-model='ambiguityPlotParams.x'
+                ng-options='label for label in headerSubstituitionDictionary.NAME_MAP'>
+            </select>
+            Y Axis
+            <select class='plot-grouping-fn-selector-box' ng-model='ambiguityPlotParams.y'
+                ng-options='label for label in headerSubstituitionDictionary.NAME_MAP'>
+            </select>
+            Z Axis (Optional)
+            <select class='plot-grouping-fn-selector-box' ng-model='ambiguityPlotParams.z'
+                ng-options='label for label in headerSubstituitionDictionary.NAME_MAP.concat("None")'>
+            </select>
+        </div>
+    </div>
+    <div class='ambiguity-plot-container'></div>
+    <div class='ambiguity-peptide-sequences-container' ng-if='describedPredictions.length > 0'>
+        <div class='ambiguity-peptide-attributes-container clearfix'>
+        <div class='pull-left ambiguity-peptide-attributes'>
+            <p>MS2 Score Range: {{describedMS2Min}} - {{describedMS2Max}}</p>
+            <p>Amino Acid Regions: {{describedPeptideRegions()}}</p>
+        </div>
+        <div class='pull-left ambiguity-peptide-attributes'>
+            <p>Peptide Sequence(s):
+                <p class='glycopeptide-identifier' ng-repeat="seq in keys(_.groupBy(describedPredictions, 'Peptide'))">
+                    {{seq}}
+                </p>
+            </p>
+            <p>Distinct Glycan Count: {{keys(_.groupBy(describedPredictions, 'Glycan')).length}}
+        </div>
+        </div>
+        <table class='table table-striped table-compact ambiguity-peptide-sequences-table'>
+            <tr>
+                <th>Scan ID</th>
+                <th>Glycopeptide Identifier</th>
+                <th>Peptide Coverage</th>
+                <th># Stub Ions</th>
+                <th>b | y Ions Coverage (+HexNAc)</th>
+                <th>MS2 Score</th>
+            </tr>
+            <tr ng-repeat='match in describedPredictions | orderBy:["MS2_Score","Glycan", "numStubs"]:true'>
+                <td>{{match.scan_id}}</td>
+                <td class='glycopeptide-identifier' ng-bind-html='match.Glycopeptide_identifier | highlightModifications'></td>
+                <td>{{match.meanCoverage | number:4}}</td>
+                <td>{{match.Stub_ions.length}}</td>
+                <td>{{match.percent_b_ion_coverage * 100|number:1}}%({{(match.percent_b_ion_with_HexNAc_coverage * 100)|number:1}}%) |
+                    {{match.percent_y_ion_coverage * 100|number:1}}%({{(match.percent_y_ion_with_HexNAc_coverage * 100)|number:1}}%)
+                    </td>
+                <td>{{match.MS2_Score}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

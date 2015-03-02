@@ -1,0 +1,45 @@
+<article class='help-content'>
+    <section>
+        <h3>General Help</h3>
+        <ul>
+            <li><a href="#what-is-this">What is this?</a></li>
+            <li><a href='#understanding-these-results'>Understanding These Results</a></li>
+        </ul>
+    </section>
+    <section id='what-is-this'>
+        <h4>What Is This?</h4>
+        <p>
+            This is the <b>Glycopeptide Tandem MS Results Viewer</b>, part of GlycReSoft2.
+        Yes, this is running in a web browser (if you're using the desktop application,
+        we're running inside a web browser inside that too). This tool is designed to help you
+        explore the complex aspects of MS<sup>2</sup> data, particularly ambiguous calls because
+        of multiple composition matches or variable positions of a post-translational modification
+        or glycosylation.
+        </p>
+
+    </section>
+    <section id='understanding-these-results'>
+        <h4>Understanding the Results</h4>
+        <section id='prediction-results-table-help'>
+            <h5>Prediction Results Table</h5>
+            <p>
+                You can browse the data in <b>Prediction Results Table</b> tab to see some basic statistics about your data, such as the <b tooltip="This score works like a quality filter for MS Matches">MS1</b> and <b tooltip="This score works like a quality filter for Tandem MS matches">MS2</b> scores for the observed ion, as well as characteristics like observed mass, and ion volume. Each row in the table corresponds to a given ion and one of its matches. A match is evaluated by statistics such as coverage of peptide backbone by B and Y ions, the number of stub ions (intact peptide backbone ions with or without attached modifications), mass match PPM error. You can filter this data by entering a <b tooltip="This expression is a combination of comparison functions on a set of attributes for each match. See the help information near the input control for more information">filtering expression</b> to reduce the number of matches shown on <em>all tabs</em>.
+            </p>
+            <p>
+                As you might have noticed, the rows are colored in an array of colors. These colors are meant to visually group matches to the same precursor ion, with the same mass and MS1 score, but with multiple MS2 matches with differing positions of modifications and glycosylation (macroheterogeneity), or different modifications or glycosylation composition at the same site (microheterogeneity). This reflects ambiguity in the data where one or more match may be present. We provide the MS2 score to help filter the low quality matches out. You can see more of this relationship in the other tabs.
+            </p>
+        </section>
+        <section id='preidction-plots-help'>
+            <h5>Prediction Plots</h5>
+            <p>
+                This tab allows you to visualize the distribution of predictions as a bubble plot. Predictions can be visualized in two ways here, mapped over the X-Y-Z axes respectively:<b tooltip='Grouped by matched ion'>MS1 Score x MS2 Score x Observed Mass</b> and <b tooltip="Grouped by mapping position on protein">Starting Amino Acid Coordinate x MS2 Score x Peptide Backbone Length</b>. Data points are colored by group, and clicking on a data point will zoom the plot to fit the window to that group, showing you their distribution in finer detail, and highlighting them on the <b href='#prediction-results-table-help'>Prediction Results Table</b>. For highly ambiguous groups, this may just show you a set of points on top of each other. In addition to zooming the plot, this will also show a subset of information in about those matches in a table below the graph. You can also zoom in further by clicking and dragging a window over the graph with your mouse.
+            </p>
+        </section>
+        <section id="protein-sequence-view-help">
+            <h5>Protein Sequence View</h5>
+            <p>
+                With this tab, you can see how the matches stack up against the original protein sequence, and where possible modifications land. Mouse over the peptide backbones fragments, shown in green, to see that match's MS2 score, and to highlight its respective modifications on the backbone. Mouse over a modification to see the best MS2 score for a match containing that modification, and if the modification is a HexNAc glycosylation site, you can click the modification to view the collection of possible glycan compositions at that site as a table and histogram.
+            </p>
+        </section>
+    </section>
+</article>

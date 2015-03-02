@@ -1,0 +1,22 @@
+{
+  "name": "GlycReSoft2WebViews",
+  "version": "0.0.0",
+  "description": "A better UI than Windows Forms",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "JKlein",
+  "license": "ISC",
+  "devDependencies": {
+    "cheerio": "^0.17.0",
+    "coffee-script": "^1.7.1",
+    "grunt": "^0.4.5",
+    "grunt-contrib-coffee": "^0.11.0",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-less": "^0.11.4",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-ng-annotate": "^0.3.2",
+    "grunt-serve": "^0.1.6"
+  }
+}

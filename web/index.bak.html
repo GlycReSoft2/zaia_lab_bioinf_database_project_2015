@@ -1,0 +1,139 @@
+<!DOCTYPE html5>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=11" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <script type="text/javascript">
+    var objects = []
+    </script>
+    <script type="text/javascript">
+
+    //Chrome passes the error object (5th param) which we must use since it now truncates the Msg (1st param).
+    window.onerror = function (errorMsg, url, lineNumber, columnNumber, errorObject) {
+        var errMsg;
+        if (errorObject && errorObject !== undefined) {
+                errMsg = errorObject.message;
+        }
+        else {
+            errMsg = errorMsg;
+        }
+        alert('Error: ' + errMsg)
+    }
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body ng-app="GlycReSoftMSMSGlycopeptideResultsViewApp" ng-controller="ClassifierResultsTableCtrl">
+    <header id='header-wrapper'>
+        <div>
+            <button id='save-csv-btn' save-csv  class="btn">Save CSV</button>
+        </div>
+        <h2 id='header-title'>GlycReSoft 2 Tandem MS Glycopeptide Analyzer</h2>
+        <div>
+          <button id='help-btn' help-menu class="btn btn-info"><b>?</b></button>
+        </div>
+    </header>
+
+    <div id="classifier-results">
+        <tabset>
+            <tab heading="Prediction Results Table" active select="scrollToSelection()">
+                <div class='gridStyle' ng-grid='gridOptions' resizable window-percent=0.6></div>
+                <div id='grid-controls'>
+                    <div id="top-control-row">
+                        <div id='filtrex-control'>
+                            <div id='filtrex-control-inner' class='input-group' ng-class="{'has-error': filtrexError}">
+                                <b>Filtering Expression</b>
+                                <a class='filtrex-ctrl-anchor' popover-html-unsafe="{{helpText.filtrex}}">Usage</a>
+                                <a class='filtrex-ctrl-anchor' popover-html-unsafe="{{'<b>' + headerSubstituitionDictionary.NAME_MAP.join('<br\>') + '</b>'}}">Filterable Names</a>
+                                <a class='filtrex-ctrl-anchor' ng-click="params.filtrexExamples = !params.filtrexExamples">Example Rules</a>
+                                <span dropdown class='filtrex-ctrl-anchor'  is-open='params.filtrexExamples'>
+                                      <ul class="dropdown-menu ">
+                                        <li ng-repeat="(rule, ruleFeatures) in filterRules">
+                                          <a ng-click="extendFiltrex(ruleFeatures.filtrex)">{{ruleFeatures.label}}</a>
+                                        </li>
+                                      </ul>
+                                </span>
+                                <br/><input type='text' id='filtrex-control-input' class='form-control' ng-model="params.filtrexExpr" ng-model-options="{updateOn: 'blur default', debounce: {'default': 20000, 'blur': 0}}"/> {{predictions.length}} Matches
+                            </div>
+                        </div>
+                    </div>
+ <!--                    <div id="bottom-control-row">
+                        <select class='grid-grouping-fn-selector-box' ng-model='params.currentGroupingRule'
+                        ng-options='value.label for (key, value) in groupingRules'
+                        ng-change="ping()">
+                        </select>
+                    </div> -->
+                </div>
+            </tab>
+            <tab heading="Prediction Plots" select="sendRenderPlotEvt()">
+                <div ambiguity-plot predictions='predictions' headers='headerSubstituitionDictionary'></div>
+            </tab>
+            <tab heading="Protein Sequence View" select="sendUpdateProteinViewEvt()">
+                <protein-sequence-view  predictions="predictions"/>
+            </tab>
+        </tabset>
+    </div>
+
+
+
+    <!-- Vendor Dependencies. -->
+    <script type="text/javascript" src='js/vendor/vendor.concat.js'></script>
+
+    <!-- Angular Application. -->
+    <script type="text/javascript" src='js/app.concat.js'></script>
+    <script type="text/javascript">
+    $(function(){
+        window.objects = []
+        window.registerDataChange = function (data){
+            try{
+                ctrl = angular.element("#classifier-results").controller()
+                objects = csvService.deserializeAfterParse(data)
+                ctrl.$apply(function(){
+                        ctrl._predictionsReceiver = objects
+                })
+                return ctrl._predictionsReceiver.length;
+            } catch (ex){
+                alert("An error occurred while injecting data: " + ex)
+            }
+
+        }
+        try{
+            d3.csv("/../Data/ResultOf20131222_004_isos_HA-Solomon_Islands_HILIC-C18-tandem_MS-results.csv", function(err, data){
+                if(err != null) console.log(err)
+                testObjects = _.cloneDeep(data)
+                ctrl = angular.element("#classifier-results").controller()
+                objects = csvService.deserializeAfterParse(data)
+                ctrl.$apply(function(){
+                    ctrl._predictionsReceiver = objects
+                })
+            })
+        } catch (ex) {
+            console.log(ex)
+        }
+    })
+    </script>
+</body>
+</html>
+<script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-header">
+        <h3 class="modal-title">{{title}}</h3>
+    </div>
+    <div class="modal-body">
+        <div ng-if='items.length > 0'>
+            <ul>
+                <li ng-repeat="item in items">
+                    {{item}}
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div ng-if='summary' ng-bind-html="summary">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <!--<button class="btn btn-warning" ng-click="cancel()">Cancel</button>-->
+    </div>
+</script>

@@ -1,0 +1,24 @@
+{
+  "name": "GlycReSoft2WebViews",
+  "version": "0.0.0",
+  "description": "A better UI than Windows Forms",
+  "main": "index.html",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "angular"
+  ],
+  "authors": [
+    "JKlein"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -1,0 +1,281 @@
+﻿#header-wrapper{
+    display: table;
+    width: 100%;
+    div {
+        display: table-cell;
+        padding: 0px 25px 0px 25px;
+    }
+}
+
+#header-title{
+    text-align: center;
+}
+
+#save-csv-btn {
+    float: left;
+}
+
+#help-btn {
+    float: right;
+}
+
+//Overrides existing rule to let the popover stretch
+.popover {
+    max-width: 400px !important;
+    .popover-content{
+        max-width: 400px !important;
+    }
+}
+
+//For the Filtrex Help Popovers only
+.help-article {
+    max-height: 500px !important;
+    overflow-y: scroll;
+    table {
+        text-align: center !important;
+        th{
+           text-align: center !important;
+        }
+    }
+}
+
+//Grid Cells
+.matched-ions-cell{
+    vertical-align: middle !important;
+    text-align: center;
+    margin: 0px !important;
+}
+
+.glycopeptide-identifier{
+    font-size: 1em;
+    white-space: normal !important;
+    word-wrap: break-word;
+    .ngCellText{
+        white-space: normal !important;
+        word-wrap: break-word;
+    }
+}
+
+.stacked-ions-cell{
+    vertical-align: middle !important;
+    margin: 0px !important;
+    > div {
+        height: 90px !important;
+        overflow-y: scroll;
+    }
+}
+
+.ngCell.stacked-ions-cell-grid{
+    vertical-align: middle !important;
+    margin: 0px;
+    overflow-y: scroll !important;
+}
+
+.fragment-ion-tag{
+    background-color: lightgrey;
+    border-radius: 3px;
+    font-size: 9.5px;
+    margin-bottom: 1px;
+    margin-top: 1px;
+}
+
+//ngGrid Style Options
+.gridStyle{
+    margin: 0.5%;
+    border: 1px solid rgb(212,212,212);
+    width: 99%;
+    height: 60%;
+    border-radius: 5px;
+}
+
+.ngViewport.ng-scope {
+height: 95% !important;
+width: 100% !important;
+}
+
+.ngHeaderCell{
+    text-align: center;
+}
+
+.ngRow.selected{
+    *{
+        background-color: lighten(seagreen,20%) !important;
+        color: white;
+    }
+}
+
+.cX{
+    background-color: inherit;
+}
+.c0{
+    background-color: lighten(orange, 40%) ;
+}
+.c1{
+    background-color: lighten(skyblue, 10%);
+}
+.c2{
+    background-color: lighten(green, 60%) ;
+}
+.c3{
+    background-color: lighten(yellow, 40%);
+}
+.c4{
+    background-color: lighten(red, 45%);
+}
+.c5{
+    background-color: lighten(violet, 20%);
+}
+
+//Filter Controls
+#grid-controls {
+    display: table;
+    width: 100%;
+}
+
+#filtrex-control{
+    padding: 25px;
+}
+#filtrex-control-inner{
+    width: 80%;
+}
+
+.filtrex-ctrl-anchor {
+    margin-left: 15px;
+}
+
+#filtrex-usage-anchor {
+    margin-left: 15px;
+}
+
+#filterable-names-anchor {
+    margin-left: 15px;
+}
+
+#filtrex-control-input{
+    width: 60%;
+    clear: both;
+    float: none;
+    border-radius: 5px;
+}
+
+#do-filt-btn {
+    margin: 4px;
+    margin-bottom: 7px;
+}
+
+//Ambiguity Plot Table CSS Options
+
+.ambiguity-plot-container{
+    width: 100%;
+}
+
+.ambiguity-peptide-sequences-container {
+    margin: 25px;
+    border: lightgrey 1px solid;
+    border-radius: 3px;
+
+    .glycopeptide-identifier {
+        max-width: 600px;
+    }
+}
+
+.ambiguity-peptide-attributes {
+    width: 50%;
+    padding: 5px;
+    text-align: center;
+    p {
+        font-weight: 900;
+    }
+}
+
+.custom-fn-menu{
+    * {
+        margin: 15px;
+    }
+}
+
+.plot-grouping-fn-selector-container {
+    margin-left: 10px;
+    //display: inline;
+    &.custom-fn-menu{
+        margin-left: 20px;
+    }
+    select{
+        margin: 15px;
+        padding: 5px;
+        border: 1px grey solid;
+        border-radius: 5px;
+    }
+}
+
+.ambiguity-peptide-sequences-table {
+    th, td {
+        text-align: center;
+    }
+}
+
+
+//Highlight Modification CSS Options
+.mod-string {
+    font-weight: 900;
+}
+
+
+//Protein Sequence Viewer CSS Options
+.protein-sequence-view-container {
+    margin-left: 2%;
+}
+//From jQuery Tooltip's CSS
+#tooltip {
+    position: absolute;
+    z-index: 3000;
+    border: 1px solid #111;
+    background-color: #eee;
+    padding: 5px;
+    opacity: 0.85;
+}
+#tooltip h3, #tooltip div {
+    margin: 0;
+}
+
+/*Modal Styles*/
+.modal {
+    display: block;
+}
+.modal-body:before,
+.modal-body:after {
+    display: table;
+    content: " ";
+}
+.modal-header:before,
+.modal-header:after {
+    display: table;
+    content: " ";
+}
+
+table.glycan-composition-frequency-table {
+    text-align: center;
+    td, th {
+        text-align: center;
+        font-size: 11px;
+    }
+    tr td:first-child {
+        font-weight: 900;
+    }
+}
+
+div.plot-modal .modal-content {
+    overflow: auto;
+    height: 80%
+}
+
+//For the help menu only
+.help-content{
+    padding: 3px;
+    h5{
+        font-weight: 900;
+    }
+    section {
+        margin: 15px;
+    }
+}

@@ -1,0 +1,3 @@
+[submodule "embed_tandem_ms_classifier"]
+	path = embed_tandem_ms_classifier
+	url = https://github.com/GlycReSoft2/embed_tandem_ms_classifier.git

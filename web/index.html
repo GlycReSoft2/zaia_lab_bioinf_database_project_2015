@@ -1,0 +1,387 @@
+<!DOCTYPE html5>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="GlycReSoftMSMSGlycopeptideResultsViewApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=11">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <script type="text/javascript">
+    var objects = []
+    </script>
+    <script type="text/javascript">
+
+    //Chrome passes the error object (5th param) which we must use since it now truncates the Msg (1st param).
+/*    window.onerror = function (errorMsg, url, lineNumber, columnNumber, errorObject) {
+        var errMsg;
+        console.log(errorMsg, url, lineNumber, errorObject)
+        if (errorObject && errorObject !== undefined) {
+                errMsg = errorObject.message;
+        }
+        else {
+            errMsg = errorMsg;
+        }
+        alert('Error: ' + errMsg)
+    }*/
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body ng-controller="ClassifierResultsTableCtrl">
+    <header id="header-wrapper">
+        <div>
+            <save-results id="save-results-btn" isopen="false" predictions="predictions" predictions-unfiltered="_predictions" metadata="metadata">
+            </save-results>
+        </div>
+        <h2 id="header-title">{{params.name}}</h2>
+        <div>
+          <button id="help-btn" help-menu="" class="btn btn-info"><b>?</b></button>
+        </div>
+    </header>
+    <div id="classifier-results" style="">
+        <tabset>
+            <tab heading="Prediction Results Table" select="scrollToSelection()">
+                <div class="gridStyle" ng-grid="gridOptions"></div>
+                <div id="grid-controls">
+                    <div id="top-control-row">
+                        <div id="filtrex-control">
+                            <div id="filtrex-control-inner" class="input-group" ng-class="{&apos;has-error&apos;: filtrexError}">
+                                <b>Filtering Expression</b>
+                                <a class="filtrex-ctrl-anchor" popover-html-unsafe="{{helpText.filtrex}}">Usage</a>
+                                <a class="filtrex-ctrl-anchor" popover-html-unsafe="{{&apos;&lt;b&gt;&apos; + headerSubstituitionDictionary.NAME_MAP.join(&apos;&lt;br\&gt;&apos;) + &apos;&lt;/b&gt;&apos;}}">Filterable Names</a>
+                                <a class="filtrex-ctrl-anchor" ng-click="params.filtrexExamples = !params.filtrexExamples">Example Rules</a>
+                                <span dropdown="" class="filtrex-ctrl-anchor" is-open="params.filtrexExamples">
+                                      <ul class="dropdown-menu ">
+                                        <li><b>&#xA0;Click to add to the filter expression</b></li>
+                                        <li ng-repeat="(rule, ruleFeatures) in filterRules">
+                                          <a ng-click="extendFiltrex(ruleFeatures.filtrex)">{{ruleFeatures.label}}</a>
+                                        </li>
+                                      </ul>
+                                </span>
+                                <br>
+                                <input type="text" id="filtrex-control-input" class="form-control" ng-model="params.filtrexExpr" ng-model-options="{updateOn: &apos;blur default&apos;, debounce: {&apos;default&apos;: 20000, &apos;blur&apos;: 0}}">
+                                <button class="btn" id="do-filt-btn" ng-click="filterByFiltrex()">Filter</button>
+                                {{predictions.length}} Matches
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </tab>
+            <tab heading="Metadata">
+                <metadata-display metadata="metadata"></metadata-display>
+            </tab>
+            <tab heading="Prediction Plots" select="sendRenderPlotEvt()">
+                <div ambiguity-plot="" predictions="predictions" headers="headerSubstituitionDictionary"></div>
+            </tab>
+            <tab heading="Protein Sequence View" select="sendUpdateProteinViewEvt()">
+                <protein-sequence-view predictions="predictions">
+            </protein-sequence-view></tab>
+        </tabset>
+    </div>
+
+
+
+    <!-- Vendor Dependencies. -->
+    <script type="text/javascript" src="js/vendor/vendor.concat.js"></script>
+
+    <!-- Angular Application. -->
+    <script type="text/javascript" src="js/app.concat.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        window.objects = []
+        console.log("Page Ready")
+        try{
+            d3.json("/../Data/ExampleResults.json", function(err, data){
+                if(err != null) console.log(err)
+                testObjects = _.cloneDeep(data)
+                ctrl = angular.element("#classifier-results").scope()
+                ctrl.update(data)
+            })
+        } catch (ex) {
+            console.log(ex)
+        }
+    })
+    </script>
+<div id="ng-template-container"><script type="text/ng-template" id="templates/ambiguity-plot-template.html">
+<div class='amiguity-container'>
+    <div class='plot-grouping-fn-selector-container'>
+        Plot Function
+        <select class='plot-grouping-fn-selector-box' ng-model='grouping.groupingFnKey'
+            ng-options='key for (key, value) in grouping.groupingsOptions' ng-change='plotSelectorChanged()'>
+        </select>
+        <label>Hide Unambiguous <input type='checkbox' ng-model='ambiguityPlotParams.hideUnambiguous'/></label>
+        <a ng-click='ambiguityPlotParams.showCustomPlotter=!ambiguityPlotParams.showCustomPlotter'> Make Your Own</a>
+        <span class='custom-fn-menu' ng-show='ambiguityPlotParams.showCustomPlotter'>
+            <button class='btn btn-primary' ng-click='customPlot()'>Plot</button>
+        </span>
+        <div ng-show='ambiguityPlotParams.showCustomPlotter' class='plot-grouping-fn-selector-container custom-fn-menu'>
+            X Axis
+            <select class='plot-grouping-fn-selector-box' ng-model='ambiguityPlotParams.x'
+                ng-options='label for label in headerSubstituitionDictionary.NAME_MAP'>
+            </select>
+            Y Axis
+            <select class='plot-grouping-fn-selector-box' ng-model='ambiguityPlotParams.y'
+                ng-options='label for label in headerSubstituitionDictionary.NAME_MAP'>
+            </select>
+            Z Axis (Optional)
+            <select class='plot-grouping-fn-selector-box' ng-model='ambiguityPlotParams.z'
+                ng-options='label for label in headerSubstituitionDictionary.NAME_MAP.concat("None")'>
+            </select>
+        </div>
+    </div>
+    <div class='ambiguity-plot-container'></div>
+    <div class='ambiguity-peptide-sequences-container' ng-if='describedPredictions.length > 0'>
+        <div class='ambiguity-peptide-attributes-container clearfix'>
+        <div class='pull-left ambiguity-peptide-attributes'>
+            <p>MS2 Score Range: {{describedMS2Min}} - {{describedMS2Max}}</p>
+            <p>Amino Acid Regions: {{describedPeptideRegions()}}</p>
+        </div>
+        <div class='pull-left ambiguity-peptide-attributes'>
+            <p>Peptide Sequence(s):
+                <p class='glycopeptide-identifier' ng-repeat="seq in keys(_.groupBy(describedPredictions, 'Peptide'))">
+                    {{seq}}
+                </p>
+            </p>
+            <p>Distinct Glycan Count: {{keys(_.groupBy(describedPredictions, 'Glycan')).length}}
+        </div>
+        </div>
+        <table class='table table-striped table-compact ambiguity-peptide-sequences-table'>
+            <tr>
+                <th>Scan ID</th>
+                <th>Glycopeptide Identifier</th>
+                <th>Peptide Coverage</th>
+                <th># Stub Ions</th>
+                <th>b | y Ions Coverage (+HexNAc)</th>
+                <th>MS2 Score</th>
+            </tr>
+            <tr ng-repeat='match in describedPredictions | orderBy:["MS2_Score","Glycan", "numStubs"]:true'>
+                <td>{{match.scan_id}}</td>
+                <td class='glycopeptide-identifier' ng-bind-html='match.Glycopeptide_identifier | highlightModifications'></td>
+                <td>{{match.meanCoverage | number:4}}</td>
+                <td>{{match.Stub_ions.length}}</td>
+                <td>{{match.percent_b_ion_coverage * 100|number:1}}%({{(match.percent_b_ion_with_HexNAc_coverage * 100)|number:1}}%) |
+                    {{match.percent_y_ion_coverage * 100|number:1}}%({{(match.percent_y_ion_with_HexNAc_coverage * 100)|number:1}}%)
+                    </td>
+                <td>{{match.MS2_Score}}</td>
+            </tr>
+        </table>
+    </div>
+</div></script><script type="text/ng-template" id="templates/filtrex-readme-trim.html">
+<!-- Not loaded by templating, but a good place to keep this content -->
+<article class="help-article">
+    <h3>Filtrex</h3>
+    <h4>Expressions</h4>
+    <p>There are only 2 types: numbers and strings.</p>
+    <table>
+        <tbody>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Numeric arithmetic</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>x + y</td>
+                        <td>Add</td>
+                    </tr>
+                    <tr>
+                        <td>x - y</td>
+                        <td>Subtract</td>
+                    </tr>
+                    <tr>
+                        <td>x * y</td>
+                        <td>Multiply</td>
+                    </tr>
+                    <tr>
+                        <td>x / y</td>
+                        <td>Divide</td>
+                    </tr>
+                    <tr>
+                        <td>x % y</td>
+                        <td>Modulo</td>
+                    </tr>
+                    <tr>
+                        <td>x ^ y</td>
+                        <td>Power</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Comparisons</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>x == y</td>
+                        <td>Equals</td>
+                    </tr>
+                    <tr>
+                        <td>x &lt; y</td>
+                        <td>Less than</td>
+                    </tr>
+                    <tr>
+                        <td>x &lt;= y</td>
+                        <td>Less than or equal to</td>
+                    </tr>
+                    <tr>
+                        <td>x &gt; y</td>
+                        <td>Greater than</td>
+                    </tr>
+                    <tr>
+                        <td>x &gt;= y</td>
+                        <td>Greater than or equal to</td>
+                    </tr>
+                    <tr>
+                        <td>x in (a, b, c)</td>
+                        <td>Equivalent to (x == a or x == b or x == c)</td>
+                    </tr>
+                    <tr>
+                        <td>x not in (a, b, c)</td>
+                        <td>Equivalent to (x != a and x != b and x != c)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Boolean logic</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>x or y</td>
+                        <td>Boolean or</td>
+                    </tr>
+                    <tr>
+                        <td>x and y</td>
+                        <td>Boolean and</td>
+                    </tr>
+                    <tr>
+                        <td>not x</td>
+                        <td>Boolean not</td>
+                    </tr>
+                    <tr>
+                        <td>x ? y : z</td>
+                        <td>If boolean x, value y, else z</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Created by Joe Walnes,
+                <a href="https://github.com/joewalnes/filtrex">
+                    <br/>(See https://github.com/joewalnes/filtrex for more usage information.)</a>
+            </p>
+</article>
+</script><script type="text/ng-template" id="templates/help-text.html">
+<article class='help-content'>
+    <section>
+        <h3>General Help</h3>
+        <ul>
+            <li><a href="#what-is-this">What is this?</a></li>
+            <li><a href='#understanding-these-results'>Understanding These Results</a></li>
+        </ul>
+    </section>
+    <section id='what-is-this'>
+        <h4>What Is This?</h4>
+        <p>
+            This is the <b>Glycopeptide Tandem MS Results Viewer</b>, part of GlycReSoft2.
+        Yes, this is running in a web browser (if you're using the desktop application,
+        we're running inside a web browser inside that too). This tool is designed to help you
+        explore the complex aspects of MS<sup>2</sup> data, particularly ambiguous calls because
+        of multiple composition matches or variable positions of a post-translational modification
+        or glycosylation.
+        </p>
+
+    </section>
+    <section id='understanding-these-results'>
+        <h4>Understanding the Results</h4>
+        <section id='prediction-results-table-help'>
+            <h5>Prediction Results Table</h5>
+            <p>
+                You can browse the data in <b>Prediction Results Table</b> tab to see some basic statistics about your data, such as the <b tooltip="This score works like a quality filter for MS Matches">MS1</b> and <b tooltip="This score works like a quality filter for Tandem MS matches">MS2</b> scores for the observed ion, as well as characteristics like observed mass, and ion volume. Each row in the table corresponds to a given ion and one of its matches. A match is evaluated by statistics such as coverage of peptide backbone by B and Y ions, the number of stub ions (intact peptide backbone ions with or without attached modifications), mass match PPM error. You can filter this data by entering a <b tooltip="This expression is a combination of comparison functions on a set of attributes for each match. See the help information near the input control for more information">filtering expression</b> to reduce the number of matches shown on <em>all tabs</em>.
+            </p>
+            <p>
+                As you might have noticed, the rows are colored in an array of colors. These colors are meant to visually group matches to the same precursor ion, with the same mass and MS1 score, but with multiple MS2 matches with differing positions of modifications and glycosylation (macroheterogeneity), or different modifications or glycosylation composition at the same site (microheterogeneity). This reflects ambiguity in the data where one or more match may be present. We provide the MS2 score to help filter the low quality matches out. You can see more of this relationship in the other tabs.
+            </p>
+        </section>
+        <section id='preidction-plots-help'>
+            <h5>Prediction Plots</h5>
+            <p>
+                This tab allows you to visualize the distribution of predictions as a bubble plot. Predictions can be visualized in two ways here, mapped over the X-Y-Z axes respectively:<b tooltip='Grouped by matched ion'>MS1 Score x MS2 Score x Observed Mass</b> and <b tooltip="Grouped by mapping position on protein">Starting Amino Acid Coordinate x MS2 Score x Peptide Backbone Length</b>. Data points are colored by group, and clicking on a data point will zoom the plot to fit the window to that group, showing you their distribution in finer detail, and highlighting them on the <b href='#prediction-results-table-help'>Prediction Results Table</b>. For highly ambiguous groups, this may just show you a set of points on top of each other. In addition to zooming the plot, this will also show a subset of information in about those matches in a table below the graph. You can also zoom in further by clicking and dragging a window over the graph with your mouse.
+            </p>
+        </section>
+        <section id="protein-sequence-view-help">
+            <h5>Protein Sequence View</h5>
+            <p>
+                With this tab, you can see how the matches stack up against the original protein sequence, and where possible modifications land. Mouse over the peptide backbones fragments, shown in green, to see that match's MS2 score, and to highlight its respective modifications on the backbone. Mouse over a modification to see the best MS2 score for a match containing that modification, and if the modification is a HexNAc glycosylation site, you can click the modification to view the collection of possible glycan compositions at that site as a table and histogram.
+            </p>
+        </section>
+    </section>
+</article>
+</script><script type="text/ng-template" id="templates/metadata-display.html">
+<div class="metadata-container">
+    <div class="metadata-section" ng-repeat="(name, content) in metadata" ng-if="policy[name].display">
+        <div ng-if="policy[name].includeUrl" ng-include="policy[name].includeUrl" scope="" onload=""></div>
+        <div ng-if="policy[name].includeHtml" ng-bind="policy[name].includeUrl"></div>
+    </div>
+</div></script><script type="text/ng-template" id="templates/modal-template.html">
+<div class="modal-header">
+    <h3 class="modal-title">I'm a modal!</h3>
+</div>
+<div class="modal-body">
+    <ul>
+        <li ng-repeat="item in items">
+            <a ng-click="selected.item = item">{{ item }}</a>
+        </li>
+    </ul>
+    Selected: <b>{{ selected.item }}</b>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>
+</script><script type="text/ng-template" id="templates/modification-list.html">
+<div>
+    <b>{{ name|inflector:"humanize"}}</b>
+    <ul>
+        <li ng-repeat="mod in content" style="color: {{getColor(mod)}} ;">
+            {{mod}}
+        </li>
+    </ul>
+</div></script><script type="text/ng-template" id="templates/save-menu.html">
+<div class='btn-group'  dropdown is-open="isopen">
+    <button type="button" class="btn save-btn dropdown-toggle">
+        Save Results <span class='caret'></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li><a class='save-filter-results-anchor' href="#">Save Filtered Results</a></li>
+        <li><a class='save-all-results-anchor' href="#">Save All Results</a></li>
+        <li>
+            <a class="open-file-anchor" href="#">Open File</a>
+            <input type="file" id="file-opener" style="display:none" />
+        </li>
+    </ul>
+</div></script><script type="text/ng-template" id="templates/summary-modal.html">
+<div class="modal-header">
+    <h3 class="modal-title">{{title}}</h3>
+</div>
+<div class="modal-body">
+    <div ng-if='items.length > 0'>
+        <ul>
+            <li ng-repeat="item in items">
+                {{item}}
+            </li>
+        </ul>
+        Selected: <b>{{ selected.item }}</b>
+    </div>
+    <div ng-if='summary' ng-bind-html="summary">
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+</div></script></div></body>
+</html>
