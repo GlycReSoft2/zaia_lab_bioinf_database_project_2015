@@ -8,6 +8,8 @@ This is a project template for the 2015 Database Project Group for the Zaia Lab
 After cloning this repository, you will need to set up the submodules:
 
 ```bash
+    git config http.postBuffer 524288000
+    git clone https://github.com/GlycReSoft2/zaia_lab_bioinf_database_project_2015.git
     git submodule init
 ```
 ### Installing Libraries
