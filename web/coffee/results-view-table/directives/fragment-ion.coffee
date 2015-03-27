@@ -1,5 +1,5 @@
 # fragment-ion.coffee
-# Directives for presenting Oxonium Ions, [ABCXYZ] Ions and Stub Ions
+# Directives for presenting Oxonium Ions, backbone Ions and Stub Ions
 
 fragmentIon = (GlycReSoftMSMSGlycopeptideResultsViewApp.directive "fragmentIon",
  () ->

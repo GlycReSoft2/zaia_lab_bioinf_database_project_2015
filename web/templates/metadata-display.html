@@ -1,0 +1,30 @@
+<div class="metadata-container">
+    <div class='clearfix'>
+        <div class="metadata-section" ng-repeat="(name, content) in metadata" ng-if="policy[name].display" style='float: left;'>
+            <div ng-if="policy[name].includeUrl" ng-include="policy[name].includeUrl" style='padding: 10px;'></div>
+            <div ng-if="policy[name].includeHtml" ng-bind="policy[name].includeUrl"></div>
+        </div>
+        <div class="fdr-table" style='float: left;'>
+            <table class='table table-bordered table-comapct'>
+                <thead>
+                    <tr>
+                        <th ng-repeat="(key, value) in metadata.fdr[0]">
+                            <span ng-if="key=='MS2_Score'">
+                                MS2 Score
+                            </span>
+                            <span ng-if="key!='MS2_Score'">
+                                {{key|inflector}}
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in metadata.fdr">
+                        <td ng-repeat="(key, value) in row">{{value}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+</div>

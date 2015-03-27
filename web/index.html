@@ -4,29 +4,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=11">
     <title></title>
-    <link rel="stylesheet" type="text/css" href="css/main.css">
-
-    <script type="text/javascript">
-    var objects = []
-    </script>
-    <script type="text/javascript">
-
-    //Chrome passes the error object (5th param) which we must use since it now truncates the Msg (1st param).
-/*    window.onerror = function (errorMsg, url, lineNumber, columnNumber, errorObject) {
-        var errMsg;
-        console.log(errorMsg, url, lineNumber, errorObject)
-        if (errorObject && errorObject !== undefined) {
-                errMsg = errorObject.message;
-        }
-        else {
-            errMsg = errorMsg;
-        }
-        alert('Error: ' + errMsg)
-    }*/
-    </script>
+    <link rel="stylesheet" type="text/css" href="css/vendor.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-<body ng-controller="ClassifierResultsTableCtrl">
+<body ng-cloak ng-controller="ClassifierResultsTableCtrl">
     <header id="header-wrapper">
         <div>
             <save-results id="save-results-btn" isopen="false" predictions="predictions" predictions-unfiltered="_predictions" metadata="metadata">
@@ -37,17 +18,57 @@
           <button id="help-btn" help-menu="" class="btn btn-info"><b>?</b></button>
         </div>
     </header>
-    <div id="classifier-results" style="">
+    <div id="classifier-results">
+        <div id="protein-selector">
+            <!-- Future selector to choose which protein to display goes here -->
+        </div>
         <tabset>
             <tab heading="Prediction Results Table" select="scrollToSelection()">
-                <div class="gridStyle" ng-grid="gridOptions"></div>
+                <div>
+                    <table id="results-table" class="table table-bordered table-compact">
+                        <thead>
+                            <tr>
+                                <th>Scan ID</th>
+                                <th class="narrow">MS2 Score</th>
+                                <th class="narrow">MS1 Score</th>
+                                <th>Observed Mass</th>
+                                <th class="narrow">Glycan Mass</th>
+                                <th class="narrow">Volume</th>
+                                <th class="narrow">PPM Error</th>
+                                <th class="wide">Glycopeptide</th>
+                                <th>Mean Coverage (+HexNAc)</th>
+                                <th class="narrow">Peptide Span</th>
+                                <th class="narrow">Stub Ions</th>
+                                <th>b Ions (+HexNAc)</th>
+                                <th>y Ions (+HexNAc)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="{{p.groupBySize &gt; 1 ? &apos;c&apos; + p.groupBy % 6 : &apos;cX&apos;}}" ng-repeat="p in predictions">
+                                <td>{{::p.scan_id_range.join(&apos;, &apos;)}}</td>
+                                <td class="narrow">{{::p.MS2_Score | limitTo: 7}}</td>
+                                <td class="narrow">{{::p.MS1_Score | limitTo: 7}}</td>
+                                <td>{{::p.Obs_Mass | limitTo: 7}}</td>
+                                <td class="narrow">{{::p.glycanMass | limitTo:7}}</td>
+                                <td class="narrow">{{::p.vol | limitTo: 7}}</td>
+                                <td class="narrow">{{::p.ppm_error | scientificNotation | limitTo: 7}}</td>
+                                <td class="wide glycopeptide-identifier" ng-bind-html="p.Glycopeptide_identifier | highlightModifications"></td>
+                                <td>{{::p.meanCoverage | limitTo: 7}} ({{::p.meanHexNAcCoverage | limitTo: 7}})</td>
+                                <td class="narrow">{{::p.startAA}}-{{::p.endAA}}&#xA0;({{::p.peptideLens}})</td>
+                                <td class="narrow">{{::p.numStubs | limitTo: 7}}</td>
+                                <td><div class="coverage-text">{{::p.percent_b_ion_coverage * 100|number:1}}% ({{::p.percent_b_ion_with_HexNAc_coverage * 100|number:1}}%)</div></td>
+                                <td><div class="coverage-text">{{::p.percent_y_ion_coverage * 100|number:1}}% ({{::p.percent_y_ion_with_HexNAc_coverage * 100|number:1}}%)</div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div id="grid-controls">
                     <div id="top-control-row">
                         <div id="filtrex-control">
                             <div id="filtrex-control-inner" class="input-group" ng-class="{&apos;has-error&apos;: filtrexError}">
                                 <b>Filtering Expression</b>
-                                <a class="filtrex-ctrl-anchor" popover-html-unsafe="{{helpText.filtrex}}">Usage</a>
-                                <a class="filtrex-ctrl-anchor" popover-html-unsafe="{{&apos;&lt;b&gt;&apos; + headerSubstituitionDictionary.NAME_MAP.join(&apos;&lt;br\&gt;&apos;) + &apos;&lt;/b&gt;&apos;}}">Filterable Names</a>
+                                <a class="filtrex-ctrl-anchor" popover-trigger="click" popover-placement="top" popover-html-unsafe="{{helpText.filtrex}}">Usage</a>
+                                <a class="filtrex-ctrl-anchor" popover-placement="top" popover-trigger="click" popover-html-unsafe="{{&apos;&lt;b&gt;&apos; + headerSubstituitionDictionary.NAME_MAP.join(&apos;&lt;br\&gt;&apos;) + &apos;&lt;/b&gt;&apos;}}">Filterable Names</a>
                                 <a class="filtrex-ctrl-anchor" ng-click="params.filtrexExamples = !params.filtrexExamples">Example Rules</a>
                                 <span dropdown="" class="filtrex-ctrl-anchor" is-open="params.filtrexExamples">
                                       <ul class="dropdown-menu ">
@@ -58,7 +79,7 @@
                                       </ul>
                                 </span>
                                 <br>
-                                <input type="text" id="filtrex-control-input" class="form-control" ng-model="params.filtrexExpr" ng-model-options="{updateOn: &apos;blur default&apos;, debounce: {&apos;default&apos;: 20000, &apos;blur&apos;: 0}}">
+                                <input type="text" id="filtrex-control-input" class="form-control" ng-model="params.filtrexExpr">
                                 <button class="btn" id="do-filt-btn" ng-click="filterByFiltrex()">Filter</button>
                                 {{predictions.length}} Matches
                             </div>
@@ -87,18 +108,7 @@
     <script type="text/javascript" src="js/app.concat.js"></script>
     <script type="text/javascript">
     $(function(){
-        window.objects = []
         console.log("Page Ready")
-        try{
-            d3.json("/../Data/ExampleResults.json", function(err, data){
-                if(err != null) console.log(err)
-                testObjects = _.cloneDeep(data)
-                ctrl = angular.element("#classifier-results").scope()
-                ctrl.update(data)
-            })
-        } catch (ex) {
-            console.log(ex)
-        }
     })
     </script>
 <div id="ng-template-container"><script type="text/ng-template" id="templates/ambiguity-plot-template.html">
@@ -324,11 +334,36 @@
 </article>
 </script><script type="text/ng-template" id="templates/metadata-display.html">
 <div class="metadata-container">
-    <div class="metadata-section" ng-repeat="(name, content) in metadata" ng-if="policy[name].display">
-        <div ng-if="policy[name].includeUrl" ng-include="policy[name].includeUrl" scope="" onload=""></div>
-        <div ng-if="policy[name].includeHtml" ng-bind="policy[name].includeUrl"></div>
+    <div class='clearfix'>
+        <div class="metadata-section" ng-repeat="(name, content) in metadata" ng-if="policy[name].display" style='float: left;'>
+            <div ng-if="policy[name].includeUrl" ng-include="policy[name].includeUrl" style='padding: 10px;'></div>
+            <div ng-if="policy[name].includeHtml" ng-bind="policy[name].includeUrl"></div>
+        </div>
+        <div class="fdr-table" style='float: left;'>
+            <table class='table table-bordered table-comapct'>
+                <thead>
+                    <tr>
+                        <th ng-repeat="(key, value) in metadata.fdr[0]">
+                            <span ng-if="key=='MS2_Score'">
+                                MS2 Score
+                            </span>
+                            <span ng-if="key!='MS2_Score'">
+                                {{key|inflector}}
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in metadata.fdr">
+                        <td ng-repeat="(key, value) in row">{{value}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
     </div>
-</div></script><script type="text/ng-template" id="templates/modal-template.html">
+</div>
+</script><script type="text/ng-template" id="templates/modal-template.html">
 <div class="modal-header">
     <h3 class="modal-title">I'm a modal!</h3>
 </div>
@@ -355,7 +390,7 @@
 </div></script><script type="text/ng-template" id="templates/save-menu.html">
 <div class='btn-group'  dropdown is-open="isopen">
     <button type="button" class="btn save-btn dropdown-toggle">
-        Save Results <span class='caret'></span>
+        File <span class='caret'></span>
     </button>
     <ul class="dropdown-menu" role="menu">
         <li><a class='save-filter-results-anchor' href="#">Save Filtered Results</a></li>
@@ -365,7 +400,8 @@
             <input type="file" id="file-opener" style="display:none" />
         </li>
     </ul>
-</div></script><script type="text/ng-template" id="templates/summary-modal.html">
+</div>
+</script><script type="text/ng-template" id="templates/summary-modal.html">
 <div class="modal-header">
     <h3 class="modal-title">{{title}}</h3>
 </div>

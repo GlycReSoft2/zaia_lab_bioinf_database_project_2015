@@ -1,0 +1,8 @@
+<div>
+    <b>{{ name|inflector:"humanize"}}</b>
+    <ul>
+        <li ng-repeat="mod in content" style="color: {{getColor(mod)}} ;">
+            {{mod}}
+        </li>
+    </ul>
+</div>

@@ -162,6 +162,8 @@ class GlycopeptideLib
         return [chunks, mods, glycan, nTerm, cTerm]
 
 
+## Incomplete pure-logic for visual components
+
 class ProteinBackboneSpace
     constructor: (@predictions, @options={}) ->
         @stacks = _.groupBy @predictions, (p) -> [p.startAA, p.endAA]

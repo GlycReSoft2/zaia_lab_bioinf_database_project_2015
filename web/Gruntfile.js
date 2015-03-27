@@ -75,9 +75,6 @@ module.exports = function(grunt){
 
                       'js/vendor/angular-ui.min.js',
                       'js/vendor/angular-ui-ieshiv.min.js',
-                      'js/vendor/ng-grid-2.0.14.debug.js',
-                      'js/vendor/ng-grid-flexible-height.js',
-                      'js/vendor/ng-grid-layout.js',
 
                       'js/vendor/ui-bootstrap-0.11.0.min.js',
                       'js/vendor/ui-bootstrap-tpls-0.11.0.min.js',
@@ -120,8 +117,8 @@ module.exports = function(grunt){
                 dest: "js/app.concat.js"
             },
             css: {
-              src: ["css/vendor/*.css", "css/vendor/biojs/*.css",  "css/style.css"],
-              dest: "css/main.css"
+              src: ["css/vendor/*.css", "css/vendor/biojs/*.css"],
+              dest: "css/vendor.css"
             }
         },
 

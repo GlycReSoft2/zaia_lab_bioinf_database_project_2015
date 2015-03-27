@@ -1,9 +1,16 @@
 #header-wrapper {
+  margin-top: 5px;
   display: table;
   width: 100%;
 }
 #header-wrapper div {
   display: table-cell;
+  width: 30%;
+  padding: 0px 25px 0px 25px;
+}
+#header-wrapper h2 {
+  display: table-cell;
+  width: 40%;
   padding: 0px 25px 0px 25px;
 }
 #header-title {
@@ -31,32 +38,11 @@
 .help-article table th {
   text-align: center !important;
 }
-.matched-ions-cell {
-  vertical-align: middle !important;
-  text-align: center;
-  margin: 0px !important;
-}
 .glycopeptide-identifier {
-  font-size: 1em;
+  font-size: 0.8em !important;
   white-space: normal !important;
   word-wrap: break-word;
-}
-.glycopeptide-identifier .ngCellText {
-  white-space: normal !important;
-  word-wrap: break-word;
-}
-.stacked-ions-cell {
-  vertical-align: middle !important;
-  margin: 0px !important;
-}
-.stacked-ions-cell > div {
-  height: 90px !important;
-  overflow-y: scroll;
-}
-.ngCell.stacked-ions-cell-grid {
-  vertical-align: middle !important;
-  margin: 0px;
-  overflow-y: scroll !important;
+  word-break: break-all;
 }
 .fragment-ion-tag {
   background-color: lightgrey;
@@ -65,23 +51,45 @@
   margin-bottom: 1px;
   margin-top: 1px;
 }
-.gridStyle {
-  margin: 0.5%;
-  border: 1px solid #d4d4d4;
-  width: 99%;
-  height: 60%;
-  border-radius: 5px;
+#results-table {
+  width: auto;
+  margin: auto;
 }
-.ngViewport.ng-scope {
-  height: 95% !important;
-  width: 100% !important;
+#results-table tbody {
+  display: block;
+  max-height: 500px;
+  min-height: 300px;
+  overflow: auto;
 }
-.ngHeaderCell {
-  text-align: center;
+#results-table thead,
+#results-table tbody tr {
+  display: table;
 }
-.ngRow.selected * {
-  background-color: #57c889 !important;
-  color: white;
+#results-table td {
+  min-width: 140px !important;
+  max-width: 140px !important;
+  font-size: 0.8em;
+}
+#results-table td.narrow {
+  min-width: 90px !important;
+  max-width: 90px !important;
+}
+#results-table td.wide {
+  min-width: 300px !important;
+  max-width: 300px !important;
+}
+#results-table th {
+  font-size: 0.85em;
+  min-width: 140px !important;
+  max-width: 140px !important;
+}
+#results-table th.wide {
+  min-width: 300px !important;
+  max-width: 300px !important;
+}
+#results-table th.narrow {
+  min-width: 90px !important;
+  max-width: 90px !important;
 }
 .cX {
   background-color: inherit;
@@ -170,9 +178,6 @@
 .ambiguity-peptide-sequences-table th,
 .ambiguity-peptide-sequences-table td {
   text-align: center;
-}
-.mod-string {
-  font-weight: 900;
 }
 .protein-sequence-view-container {
   margin-left: 2%;

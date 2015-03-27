@@ -1,9 +1,10 @@
 ﻿# Angular Application Definition
 GlycReSoftMSMSGlycopeptideResultsViewApp = angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp", [
-    "ui.bootstrap",
-    "ngGrid",
     "ngSanitize",
-    "ui"
+    "ui",
+    "ui.bootstrap",
+    "ui.bootstrap.popover",
+    "ui.bootstrap.tooltip",
 ])
 
 # Simple mathematics
@@ -29,10 +30,12 @@ registerDataChange = (data, name, format) ->
     ctrl = angular.element("#classifier-results").scope()
     if format is "csv"
       objects = CsvService.setDefaultValues(CsvService.deserializeAfterParse(data))
-    else objects = data  if format is "json"
+    else objects = data if format is "json"
+
+    name = name.replace(/\.json|\.csv$/, "")
 
     ctrl.$apply( ->
-      ctrl.params.name = (if name is `undefined` then ctrl.params.name else name)
+      ctrl.params.name = (if !name? then ctrl.params.name else name)
     )
     ctrl.update objects
     console.log data

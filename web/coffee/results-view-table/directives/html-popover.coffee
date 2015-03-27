@@ -1,8 +1,14 @@
 # html-popover.coffee
 # A shim for providing HTML content to Angular Bootstrap UI Popovers
 
+# Data Binding:
+# Put content in popover-html-unsafe=""
+# Put click, focus, or hover in popover-trigger=""
+# Put a direction in popover-placement=""
+
 angular.module('GlycReSoftMSMSGlycopeptideResultsViewApp')
     .directive("popoverHtmlUnsafePopup",  () ->
+      console.log("Init Popover Directive", arguments)
       return {
         restrict: "EA",
         replace: true,
@@ -18,5 +24,6 @@ angular.module('GlycReSoftMSMSGlycopeptideResultsViewApp')
       }
     )
     .directive("popoverHtmlUnsafe", [ "$tooltip", ($tooltip) ->
+      console.log("Init Inner Popover Directive", arguments)
       return $tooltip("popoverHtmlUnsafe", "popover", "click");
     ])

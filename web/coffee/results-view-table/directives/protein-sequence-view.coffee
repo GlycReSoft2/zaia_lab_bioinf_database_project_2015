@@ -13,8 +13,7 @@
 # jquery.tooltip
 # jquery.ui
 
-# jQuery UI is attached to angular.element, and instantiating jQuery again in noConflictMode
-# is missing the extensions
+
 angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSequenceView", ["$window", "$filter",
 "colorService", "$modal", "$timeout", ($window, $filter, colorService, $modal, $timeout) ->
         $window.modal = $modal
@@ -25,6 +24,8 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
         _shapeIter = 0
         shapes = ["diamond", "triangle", "hexagon","wave", "circle"]
 
+        # Default object settings for each feature.
+        # Overriden as needed during construction
         featureTemplate = {
             nonOverlappingStyle: {
                 heightOrRadius: 10
@@ -62,6 +63,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
             featureTypeLabel: "" # string related to featureLabel and typeLabel
         }
 
+        # Currently un-used
         legendKeyTemplate ={
             label: {
               total: 1,
@@ -120,6 +122,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
         heightLayerMap = {
         }
 
+        # $window-dependent Biojs.FeatureViewer config generation function
         generateConfig = ($window) ->
             configuration = {
                 aboveRuler: 10
@@ -161,6 +164,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
             }
             return configuration
 
+        # Stub awaiting the day I write a legend
         transformFeatuersToLegend = (featuresArray) ->
             return []
 
@@ -187,16 +191,14 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                 if typeCategoryMap[bestMod.featureTypeLabel] is "Glycan"
                     makeGlycanCompositionContent(bestMod, containingFragments)
 
-                # If glyan is not unique, collapse it into a circle
                 if /HexNAc/.test modId
-                    glycanTypeCount = (Object.keys _.groupBy(mod, (o) -> o._obj.Glycan)).length
-                    if glycanTypeCount > 1
-                        bestMod.type = "circle"
-                        bestMod.r /= 2
+                    bestMod.type = "circle"
+                    bestMod.r /= 2
 
                 topMods.push(bestMod)
             return topMods
 
+        # Obtain the set of fragments spanning a position
         fragmentsSurroundingPosition = (position, fragments) ->
             fragRanges = _.groupBy(fragments, ((frag) -> [frag.featureStart, frag.featureEnd]))
             results = []
@@ -206,6 +208,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                     results = results.concat(fragments)
             return results
 
+        # Obtain the set of fragments containing this modification
         fragmentsContainingModification = (modification, fragments) ->
             count = 0
             containingFragments = []
@@ -216,6 +219,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
             return [count/fragments.length, containingFragments]
 
 
+        # Compile the additional content displayed on the Glycan attachment symbol
         makeGlycanCompositionContent = (bestMod, containingFragments) ->
             bestMod.hasModalContent = true
             glycanMap = {}
@@ -277,6 +281,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                     })
             }
 
+        # Generate the backbone fragment plot for the clicked glycopeptide
         coverageModalHistogram = (glycoform) ->
             glycoform.hasModalContent = true
             glycoform.modalOptions = {
@@ -288,6 +293,9 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                     new PlotUtils.BackboneStackChart(glycoform._obj, ".frequency-plot-container").render()
             }
 
+        # Parses the glycopeptide's Glycan_identifier string into `feature` objects
+        # based on the template above. Each `feature` has its location-related information
+        # set relative to `startSite`
         parseGlycopeptideIdentifierToModificationsArray = (glycoform, startSite) ->
             glycopeptide = glycoform.Glycopeptide_identifier
             regex = /(\(.+?\)|\[.+?\])/
@@ -305,10 +313,6 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                     feature = _.cloneDeep(featureTemplate)
                     feature.type = if label of shapeMap then shapeMap[label] else shapeMap.PTM
 
-                    #if label not of colorMap
-                    #    colorMap[label] = nextColor()
-                    #    console.log(label, colorMap[label])
-                    #feature.fill = colorMap[label]
                     feature.fill = colorService.getColor(label)
                     feature.stroke = colorService.getColor(label)
 
@@ -358,6 +362,9 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
 
             return modifications
 
+        # Gathers glycopeptide predictions by their location on the parent protein
+        # and converts each glycopeptide into a `feature` object based on the template
+        # above.
         transformPredictionGroupsToFeatures = (predictions) ->
             fragments = _.groupBy(predictions, (p) -> [p.startAA, p.endAA])
 
@@ -377,13 +384,14 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
 
             arrange = Object.keys(fragments).sort(sortFn)
             colorIter = 0
-            #console.log arrange, fragments
+
             for fragRange in arrange
                 [start, end] = fragRange.split(",")
-                #console.log fragRange, end - start
+
                 frag = fragments[fragRange]
                 depth = 1
 
+                # Sort each fragment group by descending MS2 Score
                 frag = orderBy(frag, "MS2_Score").reverse()
 
                 for glycoform in frag
@@ -400,9 +408,11 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                     feature.typeCategory = ""
                     feature.featureTypeLabel = "glycopeptide_match"
                     feature.evidenceText = glycoform.MS2_Score
+                    # The featureId property is used as a CSS class, so make it CSS friendly
                     feature.featureId = glycoform.Glycopeptide_identifier.replace(/\[|\]|;|\(|\)/g, "-")
                     feature.y = depth * (feature.height + 2 * feature.strokeWidth) + 125
 
+                    # Generate a collection of `feature` objects from modifications on this glycopeptide
                     glycoformModifications = parseGlycopeptideIdentifierToModificationsArray(glycoform, glycoform.startAA)
                     modifications = modifications.concat(glycoformModifications)
                     feature.modifications = _.pluck(glycoformModifications, "featureId")
@@ -423,11 +433,12 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
 
             return featuresArray
 
+        # Update the current state of the widget when new data arrives
         updateView = (scope, element) ->
             scope.start = Math.min.apply(null, _.pluck(scope.predictions, "startAA"))
             scope.end = Math.max.apply(null, _.pluck(scope.predictions, "endAA"))
-            # Produce feature array
             colorService.resetPepColors()
+            # Produce feature array
             scope.featureViewerConfig.featuresArray = transformPredictionGroupsToFeatures(scope.predictions)
             scope.scanMap = _.groupBy(_.filter(scope.featureViewerConfig.featuresArray, (obj) -> obj.featureTypeLabel == "glycopeptide_match"), (obj) -> obj._obj.scan_id)
             # Produce legend
@@ -455,7 +466,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
             scope.featureViewerInstance.onFeatureClick (featureShape) ->
                 id = featureShape.featureId
                 feature =  _.find(scope.featureViewerConfig.featuresArray, {featureId: id})
-                #console.log(id, feature)
+                # Add modal window configuration handles for glycopeptides and glycans
                 if(feature.hasModalContent)
                     window.modalInstance= $modal.open({
                             templateUrl: "templates/summary-modal.html"
@@ -477,6 +488,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
 
                     modalInstance.opened.then (evt) ->
                         $timeout(feature.modalOptions.postLoadFn, 1000)
+                # Broadcast the last interacted with feature. Currently un-used
                 if(feature.featureTypeLabel == "glycopeptide_match")
                     preds = []
                     if feature._obj.scan_id?
@@ -485,7 +497,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                         preds = [feature._obj]
                     scope.$emit("selectedPredictions", {selectedPredictions: preds})
 
-
+            # 
             scope.featureViewerInstance.onFeatureOn (featureShape) ->
                 id = featureShape.featureId
                 feature =  _.find(scope.featureViewerConfig.featuresArray, {featureId: id})
@@ -534,8 +546,6 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                     "overflow-y": "scroll"
                 })
 
-
-
         return {
             restrict: "E"
             scope: {
@@ -562,10 +572,9 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "proteinSeq
                     }
 
                 }
-                window.TEST = scope
                 scope.$on "proteinSequenceView.updateProteinView", (evt, params) ->
                     updateView(scope, element)
-                scope.$watch("predictions", () -> updateView(scope, element))
+                # scope.$watch("predictions", () -> updateView(scope, element))
 
 
             template: "<div class='protein-sequence-view-container' id='protein-sequence-view-container-div'></div>"

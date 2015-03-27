@@ -1,6 +1,6 @@
 var GlycReSoftMSMSGlycopeptideResultsViewApp, registerDataChange;
 
-GlycReSoftMSMSGlycopeptideResultsViewApp = angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp", ["ui.bootstrap", "ngGrid", "ngSanitize", "ui"]);
+GlycReSoftMSMSGlycopeptideResultsViewApp = angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp", ["ngSanitize", "ui", "ui.bootstrap", "ui.bootstrap.popover", "ui.bootstrap.tooltip"]);
 
 Array.prototype.sum = function() {
   var i, total, _i, _len;
@@ -36,8 +36,9 @@ registerDataChange = function(data, name, format) {
         objects = data;
       }
     }
+    name = name.replace(/\.json|\.csv$/, "");
     ctrl.$apply(function() {
-      return ctrl.params.name = (name === undefined ? ctrl.params.name : name);
+      return ctrl.params.name = (name == null ? ctrl.params.name : name);
     });
     ctrl.update(objects);
     console.log(data);

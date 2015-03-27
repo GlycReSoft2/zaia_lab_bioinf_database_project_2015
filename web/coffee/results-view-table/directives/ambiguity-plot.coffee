@@ -61,7 +61,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "ambiguityP
                     contents += "Number of Matches: <b>#{point.series.data.length}</b><br/>"
                     return contents
                 headerFormat: "<span style=\"color:{series.color}\">●</span> {series.name}</span><br/>"
-                #Leading space is required to align the first character of each row.
+                # Leading space is required to align the first character of each row.
 
                 positioner: (boxWidth, boxHeight, point) ->
                     ttAnchor = {x: point.plotX, y: point.plotY}
@@ -90,6 +90,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "ambiguityP
             series: seriesData
         } # Close template
 
+    # Create a new plot function on the fly based on bound form data
     genericGroupingFn = (xAxis, yAxis, zAxis, groupingName = "") ->
         if groupingName is ""
             groupingName = xAxis.name
@@ -127,12 +128,14 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "ambiguityP
         return fn
 
 
+    # Re-render the plot with new data
     updatePlot = (predictions, scope, element) ->
         # Get grouping configuration bound from UI
         groupParams = scope.grouping.groupingFnKey
+
         # Generate grouped series data
         scope.seriesData = groupParams.groupingFn(predictions)
-        #console.log("Series Data: ", scope.seriesData)
+
         scope.describedPredictions = []
         {ionSeries, notAmbiguous} = scope.seriesData
         if not scope.ambiguityPlotParams.hideUnambiguous
@@ -158,6 +161,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "ambiguityP
                 scope.describedMS2Min = 0
                 scope.describedMS2Max = 0
                 scope.grouping = {}
+                # The built-in plotting functions
                 scope.grouping.groupingsOptions = {
                     "MS1 Score + Mass": {
                         groupingFn: genericGroupingFn(
@@ -179,9 +183,9 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "ambiguityP
                         yAxisTitle: "MS2 Score"
                         plotType: 'bubble'
                     }
-                    "Scan Number": {
+                    "Scan Time": {
                         groupingFn: genericGroupingFn(
-                                {name: 'Scan Number', getter: "scan_id"}
+                                {name: 'Starting Scan', getter: "scan_id"}
                                 {name: 'Mean Peptide Coverage', getter: 'meanCoverage'}
                                 {name: 'None', getter: (p) -> null}
                             )
@@ -205,6 +209,8 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "ambiguityP
                 scope.plotSelectorChanged = ->
                     updatePlot(scope.predictions, scope, element)
                     return true
+
+                # Generate a new plotting function on the fly from bound form data
                 scope.customPlot = ->
                     x = scope.ambiguityPlotParams.x
                     y = scope.ambiguityPlotParams.y
@@ -238,7 +244,7 @@ angular.module("GlycReSoftMSMSGlycopeptideResultsViewApp").directive "ambiguityP
                     )
                 scope.$on "ambiguityPlot.renderPlot", (evt, params)->
                     updatePlot(scope.predictions, scope, element)
-                scope.$watch("predictions", ()-> updatePlot(scope.predictions, scope, element))
+                # scope.$watch("predictions", ()-> updatePlot(scope.predictions, scope, element))
                 scope.$watch('ambiguityPlotParams.hideUnambiguous', (newVal, oldVal) ->
                         updatePlot(scope.predictions, scope, element)
                     )

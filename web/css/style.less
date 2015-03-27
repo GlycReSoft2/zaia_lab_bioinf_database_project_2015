@@ -1,8 +1,15 @@
 ﻿#header-wrapper{
+    margin-top: 5px;
     display: table;
     width: 100%;
     div {
         display: table-cell;
+        width: 30%;
+        padding: 0px 25px 0px 25px;
+    }
+    h2 {
+        display: table-cell;
+        width: 40%;
         padding: 0px 25px 0px 25px;
     }
 }
@@ -39,36 +46,13 @@
     }
 }
 
-//Grid Cells
-.matched-ions-cell{
-    vertical-align: middle !important;
-    text-align: center;
-    margin: 0px !important;
-}
+//Results Table Stlyes
 
 .glycopeptide-identifier{
-    font-size: 1em;
+    font-size: 0.8em !important;
     white-space: normal !important;
     word-wrap: break-word;
-    .ngCellText{
-        white-space: normal !important;
-        word-wrap: break-word;
-    }
-}
-
-.stacked-ions-cell{
-    vertical-align: middle !important;
-    margin: 0px !important;
-    > div {
-        height: 90px !important;
-        overflow-y: scroll;
-    }
-}
-
-.ngCell.stacked-ions-cell-grid{
-    vertical-align: middle !important;
-    margin: 0px;
-    overflow-y: scroll !important;
+    word-break: break-all;
 }
 
 .fragment-ion-tag{
@@ -79,28 +63,43 @@
     margin-top: 1px;
 }
 
-//ngGrid Style Options
-.gridStyle{
-    margin: 0.5%;
-    border: 1px solid rgb(212,212,212);
-    width: 99%;
-    height: 60%;
-    border-radius: 5px;
-}
-
-.ngViewport.ng-scope {
-height: 95% !important;
-width: 100% !important;
-}
-
-.ngHeaderCell{
-    text-align: center;
-}
-
-.ngRow.selected{
-    *{
-        background-color: lighten(seagreen,20%) !important;
-        color: white;
+#results-table{
+    width: auto;
+    margin: auto;
+    tbody {
+        display: block;
+        max-height: 500px;
+        min-height: 300px;
+        overflow: auto;
+    }
+    thead, tbody tr {
+        display: table;
+    }
+    td {
+        min-width: 140px !important;
+        max-width: 140px !important;
+        &.narrow{
+            min-width: 90px !important;    
+            max-width: 90px !important;                
+        }
+        &.wide {
+            min-width: 300px !important;    
+            max-width: 300px !important;    
+        }
+        font-size: 0.8em;
+    }
+    th {
+        font-size: 0.85em;
+        min-width: 140px !important;
+        max-width: 140px !important;
+        &.wide{
+            min-width: 300px !important;
+            max-width: 300px !important;
+        }
+        &.narrow{
+            min-width: 90px !important;    
+            max-width: 90px !important;                
+        }
     }
 }
 
@@ -196,7 +195,6 @@ width: 100% !important;
 
 .plot-grouping-fn-selector-container {
     margin-left: 10px;
-    //display: inline;
     &.custom-fn-menu{
         margin-left: 20px;
     }
@@ -214,17 +212,11 @@ width: 100% !important;
     }
 }
 
-
-//Highlight Modification CSS Options
-.mod-string {
-    font-weight: 900;
-}
-
-
 //Protein Sequence Viewer CSS Options
 .protein-sequence-view-container {
     margin-left: 2%;
 }
+
 //From jQuery Tooltip's CSS
 #tooltip {
     position: absolute;
